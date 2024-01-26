@@ -1,0 +1,289 @@
+get Posts: 
+r.getHot().map(post => post.title).then(console.log);
+
+var KINDS = {
+  t1: 'Comment',
+
+  t3: 'Submission',
+
+  t5: 'Subreddit',
+
+
+  Listing: 'Listing',
+  more: 'More',
+
+};
+
+
+  getSubreddit(displayName) {
+    return this._newObject('Subreddit', {
+      display_name: displayName.replace(/^\/?r\//, '')
+    });
+  }
+
+     * r.getSubreddit('AskReddit')
+   * // => Subreddit { display_name: 'AskReddit' }
+   * r.getSubreddit('AskReddit').created_utc.then(console.log)
+   * // => 1201233135
+   */
+
+
+     getSubmission(submissionId) {
+    return this._newObject('Submission', {
+      name: (0, _helpers.addFullnamePrefix)(submissionId, 't3_')
+    });
+  }
+     * @summary Gets information on a given submission.
+   * @param {string} submissionId - The base36 id of the submission
+   * @returns {Submission} An unfetched Submission object for the requested submission
+   * @example
+   *
+   * r.getSubmission('2np694')
+   * // => Submission { name: 't3_2np694' }
+   * r.getSubmission('2np694').title.then(console.log)
+   * // => 'What tasty food would be distusting if eaten over rice?'
+   */
+
+
+   @summary Gets a Listing of hot posts.
+   * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
+   the front page of reddit.
+   * @param {object} [options={}] Options for the resulting Listing
+   * @returns {Promise} A Listing containing the retrieved submissions
+   * @example
+   *
+   * r.getHot().then(console.log)
+   * // => Listing [
+   * //  Submission { domain: 'imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'pics' }, ... },
+   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'funny' }, ... },
+   * //  ...
+   * // ]
+   *
+   * r.getHot('gifs').then(console.log)
+   * // => Listing [
+   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'gifs' }, ... },
+   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'gifs' }, ... },
+   * //  ...
+   * // ]
+   *
+   * r.getHot('redditdev', {limit: 1}).then(console.log)
+   * // => Listing [
+   //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
+   * // ]
+   */
+
+
+  getHot(subredditName, options) {
+    return this._getSortedFrontpage('hot', subredditName, options);
+  }
+  /**
+   * @summary Gets a Listing of best posts.
+   * @param {object} [options={}] Options for the resulting Listing
+   * @returns {Promise<Listing>} A Listing containing the retrieved submissions
+   * @example
+   *
+   * r.getBest().then(console.log)
+   * // => Listing [
+   * //  Submission { domain: 'imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'pics' }, ... },
+   * //  Submission { domain: 'i.imgur.com', banned_by: null, subreddit: Subreddit { display_name: 'funny' }, ... },
+   * //  ...
+   * // ]
+   *
+   * r.getBest({limit: 1}).then(console.log)
+   * // => Listing [
+   //   Submission { domain: 'self.redditdev', banned_by: null, subreddit: Subreddit { display_name: 'redditdev' }, ...}
+   * // ]
+   */
+
+
+  getBest(options) {
+    return this._getSortedFrontpage('best', undefined, options);
+  }
+  /**
+   * @summary Gets a Listing of new posts.
+   * @param {string} [subredditName] The subreddit to get posts from. If not provided, posts are fetched from
+   the front page of reddit.
+   * @param {object} [options={}] Options for the resulting Listing
+   * @returns {Promise} A Listing containing the retrieved submissions
+   * @example
+   *
+   * r.getNew().then(console.log)
+   * // => Listing [
+   * //  Submission { domain: 'self.Jokes', banned_by: null, subreddit: Subreddit { display_name: 'Jokes' }, ... },
+   * //  Submission { domain: 'self.AskReddit', banned_by: null, subreddit: Subreddit { display_name: 'AskReddit' }, ... },
+   * //  ...
+   * // ]
+   *
+   */
+
+
+  getNew(subredditName, options) {
+    return this._getSortedFrontpage('new', subredditName, options);
+  }
+
+     * @summary Gets information on a comment with a given id.
+   * @param {string} commentId - The base36 id of the comment
+   * @returns {Comment} An unfetched Comment object for the requested comment
+   * @example
+   *
+   * r.getComment('c0b6xx0')
+   * // => Comment { name: 't1_c0b6xx0' }
+   * r.getComment('c0b6xx0').author.name.then(console.log)
+   * // => 'Kharos'
+   */
+
+
+  getComment(commentId) {
+    return this._newObject('Comment', {
+      name: (0, _helpers.addFullnamePrefix)(commentId, 't1_')
+    });
+  }
+
+
+    /**
+   * @summary Gets a Listing of new comments.
+   * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
+   the front page of reddit.
+   * @param {object} [options={}] Options for the resulting Listing
+   * @returns {Promise} A Listing containing the retrieved comments
+   * @example
+   *
+   * r.getNewComments().then(console.log)
+   * // => Listing [
+   * //  Comment { link_title: 'What amazing book should be made into a movie, but hasn\'t been yet?', ... }
+   * //  Comment { link_title: 'How far back in time could you go and still understand English?', ... }
+   * // ]
+   */
+
+
+  getNewComments(subredditName, options) {
+    return this._getSortedFrontpage('comments', subredditName, options);
+  }
+
+ @summary Conducts a search of reddit submissions.
+   * @param {object} options Search options. Can also contain options for the resulting Listing.
+   * @param {string} options.query The search query
+   * @param {string} [options.time] Describes the timespan that posts should be retrieved from. One of
+   `hour, day, week, month, year, all`
+   * @param {Subreddit|string} [options.subreddit] The subreddit to conduct the search on.
+   * @param {boolean} [options.restrictSr=true] Restricts search results to the given subreddit
+   * @param {string} [options.sort] Determines how the results should be sorted. One of `relevance, hot, top, new, comments`
+   * @param {string} [options.syntax='plain'] Specifies a syntax for the search. One of `cloudsearch, lucene, plain`
+   * @returns {Promise} A Listing containing the search results.
+   * @example
+   *
+   * r.search({
+   *   query: 'Cute kittens',
+   *   subreddit: 'aww',
+   *   sort: 'top'
+   * }).then(console.log)
+   * // => Listing [
+   * //  Submission { domain: 'i.imgur.com', banned_by: null, ... },
+   * //  Submission { domain: 'imgur.com', banned_by: null, ... },
+   * //  ...
+   * // ]
+   */
+
+
+  search(options) {
+    if (options.subreddit instanceof snoowrap.objects.Subreddit) {
+      options.subreddit = options.subreddit.display_name;
+    }
+
+  * @summary Gets a Listing of new comments.
+   * @param {string} [subredditName] The subreddit to get comments from. If not provided, posts are fetched from
+   the front page of reddit.
+   * @param {object} [options={}] Options for the resulting Listing
+   * @returns {Promise} A Listing containing the retrieved comments
+   * @example
+   *
+   * r.getNewComments().then(console.log)
+   * // => Listing [
+   * //  Comment { link_title: 'What amazing book should be made into a movie, but hasn\'t been yet?', ... }
+   * //  Comment { link_title: 'How far back in time could you go and still understand English?', ... }
+   * // ]
+   */
+
+
+  getNewComments(subredditName, options) {
+    return this._getSortedFrontpage('comments', subredditName, options);
+  }
+
+
+  import Listing from './Listing';
+import RedditUser from './RedditUser';
+import Subreddit from './Subreddit';
+import VoteableContent from './VoteableContent';
+
+export default class Comment extends VoteableContent<Comment> {
+  approved: boolean;
+  body_html: string;
+  body: string;
+  collapsed_reason: any; // ?
+  collapsed: boolean;
+  controversiality: number;
+  depth: number;
+  ignore_reports: boolean;
+  /** True if comment author is the same as the Submission author */
+  is_submitter: boolean;
+  link_id: string;
+  parent_id: string;
+  removed: boolean;
+  replies: Listing<Comment>;
+  score_hidden: boolean;
+  spam: boolean;
+}
+
+
+import * as Snoowrap from '../snoowrap';
+
+export default class Listing<T> extends Array<T> {
+  constructor(options: any, _r: Snoowrap);
+  isFinished: boolean;
+  is_finished: boolean;
+  fetchMore(options: FetchMoreOptions): Listing<T>;
+  fetchAll(options?: FetchMoreOptions): Listing<T>;
+  /* @deprecated */ fetchUntil(options?: FetchMoreOptions): Listing<T>;
+  toJSON(): T[];
+}
+
+export interface ListingOptions {
+  limit?: number;
+  after?: string;
+  before?: string;
+  show?: string;
+  count?: number;
+}
+
+export interface SortedListingOptions extends ListingOptions {
+  time?: 'all' | 'hour' | 'day' | 'week' | 'month' | 'year';
+}
+
+interface FetchMoreOptions {
+  amount: number;
+  skipReplies?: boolean;
+  skip_replies?: boolean;
+  append?: boolean;
+}
+
+
+
+
+export interface ListingOptions {
+  limit?: number;
+  after?: string;
+  before?: string;
+  show?: string;
+  count?: number;
+}
+
+  export interface BaseSearchOptions {
+    query: string;
+    time?: 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
+    sort?: 'relevance' | 'hot' | 'top' | 'new' | 'comments';
+    syntax?: 'cloudsearch' | 'lucene' | 'plain';
+  }
+
+
+  searchSubredditNames(options: { query: string; exact?: boolean; includeNsfw?: boolean; }): Promise<string[]>;
+  searchSubreddits(options: ListingOptions & { query: string }): Promise<_Listing<_Subreddit>>;

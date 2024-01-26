@@ -1,0 +1,10 @@
+{
+    "client_id": "2rt9FcxI_inI7cDhkOC4gg",
+    "client_secret": "67aXrj8Y6YprsxLCA3_Ad4lUwvGpig",
+    "refresh_token": "put_your_refresh_token_here",
+    "user_agent": "put_a_descriptive_useragent_string_here",
+    "username": "put a username here",
+    "password": "put a password here",
+    "redirect_uri": "put the redirect URI here",
+    "installed_app_client_id": "put_your_installed_app_client_id_here"
+  }

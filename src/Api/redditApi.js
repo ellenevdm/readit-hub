@@ -1,20 +1,14 @@
 
-export const API_ROOT = "https://www.reddit.com/"
+import snoowrap from "snoowrap";
 
-export const getSubredditPosts = async (subreddit) => {
-    const response = await fetch(`${API_ROOT}/r/${subreddit}.json`)
-    const json = await response.json()
-    return json.data.children.map((post) => post.data)
-}
 
-export const getSubreddits = async () => {
-    const response = await fetch(`${API_ROOT}/subreddit.json`)
-    const json = await response.json()
-    return json.data.children.map((subreddit) => subreddit.data)
-}
 
-export const getComments = async (permalink) => {
-    const response = fetch(`${API_ROOT}${permalink}.json`)
-    const json = (await response).json()
-    return json[1].data.children.map((comment) => comment.data)
-}
+ const reddit = new snoowrap({
+  userAgent: 'CustomAppBrneodn',
+  clientId: 'kjtQbronJ9vNJj4vd3jOnQ',
+  clientSecret: '6JNtDNINIaPVMtISYcQikW7RtepD8w',
+  username: 'TurbulentTotal6583',
+  password:'1qaz@WSX'
+  });
+  
+export default reddit
