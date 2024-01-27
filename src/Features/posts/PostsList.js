@@ -5,16 +5,17 @@ import {
 	selectPosts,
 	selectSelectedSubreddit,
 } from "../../store/redditSlice";
+
 import PostItem from "./PostItem";
+
 function PostsList() {
 	const posts = useSelector(selectPosts);
 	const selectedSubreddit = useSelector(selectSelectedSubreddit);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-	    dispatch(fetchPosts(selectedSubreddit))
-	}, [dispatch, selectedSubreddit])
-
+		dispatch(fetchPosts({ subreddit: selectedSubreddit }));
+	}, [dispatch, selectedSubreddit]);
 
 	return (
 		<div>

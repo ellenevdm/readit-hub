@@ -1,18 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
 import reddit from "../Api/redditApi";
 
 export const fetchSubreddits = createAsyncThunk(
 	"subreddits/fetchSubreddits",
-	async (_,{ dispatch }) => {
+	async (_, { dispatch }) => {
 		try {
-			
-			const subreddits = await reddit.getPopularSubreddits({
+			const subreddits = await reddit.getDefaultSubreddits({
 				limit: 10,
 			});
-			
+
 			return subreddits;
 		} catch (error) {
-			
 			console.log(error);
 		}
 	}
@@ -25,9 +24,7 @@ const subredditsSlice = createSlice({
 		subredditsLoading: false,
 		error: null,
 	},
-	reducers: {
-
-	},
+	reducers: {},
 	extraReducers: (builder) =>
 		builder
 			.addCase(fetchSubreddits.pending, (state) => {
@@ -37,7 +34,6 @@ const subredditsSlice = createSlice({
 			.addCase(fetchSubreddits.fulfilled, (state, { payload }) => {
 				state.subredditsLoading = false;
 				state.subreddits = payload;
-				
 			})
 			.addCase(fetchSubreddits.rejected, (state, { payload }) => {
 				state.subredditsLoading = false;

@@ -8,18 +8,20 @@ import {
 	fetchSubreddits,
 	selectedSubreddits,
 } from "../../store/subredditsSlice";
-import Subreddit from "./Subreddit";
+
+import Image from "react-bootstrap/Image";
+import ListGroup from "react-bootstrap/ListGroup";
 import { useNavigate } from "react-router";
+import Subreddit from "./Subreddit";
+
 function SubredditsList() {
 	const dispatch = useDispatch();
 	const subreddits = useSelector(selectedSubreddits);
 	const selectedSubreddit = useSelector(selectSelectedSubreddit);
-    const navigate = useNavigate();
 
-    const handleSubredditClick = (subredditName) => {
-        dispatch(setSelectedSubreddit(subredditName));
-        navigate('/');
-    }
+	const handleSubredditClick = (subredditName) => {
+		dispatch(setSelectedSubreddit(subredditName));
+	};
 
 	useEffect(() => {
 		dispatch(fetchSubreddits());
@@ -28,17 +30,29 @@ function SubredditsList() {
 	return (
 		<div>
 			<h3>Popular Subreddits</h3>
-			<ul>
+			<ListGroup>
 				{subreddits.map((subreddit, index) => (
-					<Subreddit
+					<ListGroup.Item
+						action
+						onClick={() => handleSubredditClick(subreddit.display_name)}
 						key={index}
-						subreddit={subreddit}
-						onClick={() =>
-							handleSubredditClick(subreddit.display_name)
-						}
-					/>
+					>
+						{subreddit.icon_img && (
+							<img
+								src={subreddit.icon_img}
+								alt="Subreddit header image"
+								className="rounded-circle"
+								width={50}
+								height={50}
+							/>
+						)}
+						<b>{subreddit.display_name_prefixed}</b>
+						{subreddit.public_description && (
+							<p>{subreddit.public_description}</p>
+						)}
+					</ListGroup.Item>
 				))}
-			</ul>
+			</ListGroup>
 		</div>
 	);
 }

@@ -1,15 +1,23 @@
-import {
-	createAsyncThunk,
-	createSelector,
-	createSlice,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
 import reddit from "../Api/redditApi";
 
 export const fetchPosts = createAsyncThunk(
 	"reddit/fetchPosts",
-	async (subreddit) => {
+	async ({ subreddit, searchQuery }) => {
 		try {
-			const posts = await reddit.getHot(subreddit, { limit: 10 });
+			let posts;
+			if (searchQuery) {
+				posts = await reddit.search({
+					query: searchQuery,
+					sort: "relevance",
+					time: "all",
+					limit: 10,
+				});
+			} else {
+				posts = await reddit.getHot(subreddit, { limit: 10 });
+			}
+
 			return posts;
 		} catch (error) {
 			console.log(error);
@@ -21,10 +29,34 @@ export const fetchPostDetails = createAsyncThunk(
 	"reddit/fetchPostDetails",
 	async (postId) => {
 		try {
-			const post = await reddit.getSubmission(postId);
-			const allComments = await post.comments;
-			const comments = allComments.splice(0, 10);
-			return { post, comments };
+			const post = await reddit.getSubmission(postId).fetch();
+			const allComments = await reddit.getSubmission(postId).comments;
+
+			// Extract only the serializable information from the post
+			let serializablePost = {
+				id: post.id,
+				title: post.title,
+				subreddit_name_prefixed: post.subreddit_name_prefixed,
+				selftext: post.selftext,
+				selftext_html: post.selftext_html,
+				score: post.score,
+			};
+
+			if (post.preview && post.preview.images) {
+				serializablePost.preview = {
+					images: post.preview.images.map((image) => image.source.url),
+				};
+			}
+
+			// Take the first 10 comments
+			const comments = allComments.slice(0, 10).map((comment) => ({
+				id: comment.id,
+				body: comment.body,
+				score: comment.score,
+				// Include only necessary properties, adjust as needed
+			}));
+
+			return { post: serializablePost, comments };
 		} catch (error) {
 			console.log(error);
 			throw error;
@@ -36,11 +68,22 @@ const redditSlice = createSlice({
 	name: "redditPosts",
 	initialState: {
 		selectedSubreddit: "popular",
-		searchTerm: "",
+		searchQuery: "",
 		selectedPostId: null,
 		posts: [],
 		postDetails: {
-			post: null,
+			post: {
+				id: "",
+				title: "",
+				subreddit_name_prefixed: "",
+				selftext: "",
+				selftext_html: "",
+
+				score: 0,
+				preview: {
+					images: [],
+				},
+			},
 			comments: [],
 		},
 		status: "idle",
@@ -50,14 +93,8 @@ const redditSlice = createSlice({
 		setSelectedSubreddit: (state, { payload }) => {
 			state.selectedSubreddit = payload;
 		},
-		setSearchTerm: (state, { payload }) => {
-			state.searchTerm = payload;
-		},
-		setDetailedPost: (state, { payload }) => {
-			state.postDetails.post = payload;
-		},
-		setComments: (state, { payload }) => {
-			state.postDetails.comments = payload;
+		setSearchQuery: (state, { payload }) => {
+			state.searchQuery = payload;
 		},
 		setSelectedPostId: (state, { payload }) => {
 			state.selectedPostId = payload;
@@ -93,11 +130,10 @@ const redditSlice = createSlice({
 
 export default redditSlice.reducer;
 export const {
-	setSearchTerm,
+	setSearchQuery,
 	setSelectedSubreddit,
-	setDetailedPost,
+
 	setSelectedPostId,
-	setComments,
 } = redditSlice.actions;
 
 export const selectSelectedSubreddit = (state) =>
@@ -106,16 +142,4 @@ export const selectPosts = (state) => state.reddit.posts; //
 export const selectDetailedPost = (state) => state.reddit.postDetails.post;
 export const selectComments = (state) => state.reddit.postDetails.comments; //
 export const selectPostId = (state) => state.reddit.selectedPostId;
-export const selectSearchTerm = (state) => state.reddit.searchTerm;
-
-export const selectSearchedPosts = createSelector(
-	[selectSearchTerm, selectPosts],
-	(searchTerm, posts) => {
-		if (searchTerm.length > 0) {
-			posts = posts.filter((post) =>
-				post.title.toLowerCase().includes(searchTerm.toLowerCase())
-			);
-		}
-		return posts;
-	}
-);
+export const selectSearchQuery = (state) => state.reddit.searchQuery;

@@ -19,7 +19,6 @@ function PostItem({ post }) {
 				<button
 					button
 					type="button"
-					onClick={handleClick}
 				>
 					View Post
 				</button>

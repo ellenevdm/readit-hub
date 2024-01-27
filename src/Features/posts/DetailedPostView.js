@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router";
 import {
 	fetchPostDetails,
 	selectComments,
 	selectDetailedPost,
 } from "../../store/redditSlice";
-import CommentList from "./CommentList";
+
+import { useParams } from "react-router";
 
 function DetailedPostView() {
 	const dispatch = useDispatch();
 	const post = useSelector(selectDetailedPost);
-	const allComments = useSelector(selectComments);
+	const comments = useSelector(selectComments);
 	const { postId } = useParams();
 
 	useEffect(() => {
@@ -19,10 +19,31 @@ function DetailedPostView() {
 	}, [dispatch, postId]);
 
 	return (
-		<div>
-			{post && <h2>{post}</h2>}
+		<div className="card">
+			{post && <h2>{post.title}</h2>}
+			{post.subreddit_name_prefixed}
+			<p>{post.selftext}</p>
+			<em>{post.score}</em>
+			{/* {JSON.stringify(post.preview.images)} */}
 
-			<CommentList comments={comments} />
+			{post.preview &&
+				post.preview.images &&
+				post.preview.images.length > 0 && (
+					<img
+						style={{ maxWidth: "400px" }}
+						className="card"
+						src={post.preview.images[0]}
+					/>
+				)}
+
+			<div className="">
+				{comments.map((comment) => (
+					<div key={comment.id}>
+						<p>{comment.body}</p>
+						<p>{comment.score}</p>
+					</div>
+				))}
+			</div>
 			{/* </div> */}
 		</div>
 	);
