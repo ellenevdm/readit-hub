@@ -6,17 +6,42 @@ export const fetchPosts = createAsyncThunk(
 	"reddit/fetchPosts",
 	async ({ subreddit, searchQuery }) => {
 		try {
-			let posts;
+			let allPosts;
 			if (searchQuery) {
-				posts = await reddit.search({
+				allPosts = await reddit.search({
 					query: searchQuery,
 					sort: "relevance",
 					time: "all",
 					limit: 10,
 				});
 			} else {
-				posts = await reddit.getHot(subreddit, { limit: 10 });
+				allPosts = await reddit.getHot(subreddit, { limit: 10 });
 			}
+			// const posts = allPosts.map((post) => (
+			// 	const mappedPost = {
+			// 	id: post.id,
+			// 	title: post.title,
+			//     subreddit_name_prefixed: post.subreddit_name_prefixed,
+			//     selftext_html: post.selftext_html,
+			// 	}
+			// 	if (post.preview &&)
+			// ))
+			const posts = allPosts.map((post) => {
+				const simplifiedPost = {
+					id: post.id,
+					author: post.author,
+					title: post.title,
+					subreddit_name_prefixed: post.subreddit_name_prefixed,
+					selftext: post.selftext,
+					score: post.score,
+				};
+				if (post.preview && post.preview.images.length > 0) {
+					simplifiedPost.preview = {
+						images: post.preview.images[0].source.url,
+					};
+				}
+				return simplifiedPost;
+			});
 
 			return posts;
 		} catch (error) {
@@ -30,12 +55,14 @@ export const fetchPostDetails = createAsyncThunk(
 	async (postId) => {
 		try {
 			const post = await reddit.getSubmission(postId).fetch();
+
 			const allComments = await reddit.getSubmission(postId).comments;
 
 			// Extract only the serializable information from the post
 			let serializablePost = {
 				id: post.id,
 				title: post.title,
+				author: post.author.name,
 				subreddit_name_prefixed: post.subreddit_name_prefixed,
 				selftext: post.selftext,
 				selftext_html: post.selftext_html,
@@ -49,14 +76,27 @@ export const fetchPostDetails = createAsyncThunk(
 			}
 
 			// Take the first 10 comments
-			const comments = allComments.slice(0, 10).map((comment) => ({
-				id: comment.id,
-				body: comment.body,
-				score: comment.score,
-				// Include only necessary properties, adjust as needed
-			}));
+			let slicedComments = allComments.slice(0, 10);
+			const simplifiedComments = slicedComments.map((comment) => {
+				const simplifiedComment = {
+					id: comment.id,
+					author: comment.author.name,
+					body: comment.body,
+					score: comment.score,
+				};
+				return simplifiedComment;
+			});
 
-			return { post: serializablePost, comments };
+			// let comments = allComments.slice(0, 10);
+			// comments = comments.map((comment) => ({
+			// 	id: comment.id,
+			// 	author: comment.author,
+			// 	body: comment.body,
+			// 	score: comment.score,
+			// 	// Include only necessary properties, adjust as needed
+			// }));
+
+			return { post: serializablePost, comments: simplifiedComments };
 		} catch (error) {
 			console.log(error);
 			throw error;
@@ -75,6 +115,7 @@ const redditSlice = createSlice({
 			post: {
 				id: "",
 				title: "",
+				author: "",
 				subreddit_name_prefixed: "",
 				selftext: "",
 				selftext_html: "",

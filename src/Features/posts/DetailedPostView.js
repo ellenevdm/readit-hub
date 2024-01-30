@@ -7,6 +7,7 @@ import {
 } from "../../store/redditSlice";
 
 import { useParams } from "react-router";
+import CommentList from "../../Components/CommentList";
 
 function DetailedPostView() {
 	const dispatch = useDispatch();
@@ -19,14 +20,16 @@ function DetailedPostView() {
 	}, [dispatch, postId]);
 
 	return (
-		<div className="card">
+		<>
 			{post && <h2>{post.title}</h2>}
-			{post.subreddit_name_prefixed}
-			<p>{post.selftext}</p>
-			<em>{post.score}</em>
+			{post && post.subreddit_name_prefixed}
+			<h5>{post && post.author}</h5>
+			<p>{post && post.selftext}</p>
+			<em>{post && post.score}</em>
 			{/* {JSON.stringify(post.preview.images)} */}
 
-			{post.preview &&
+			{post &&
+				post.preview &&
 				post.preview.images &&
 				post.preview.images.length > 0 && (
 					<img
@@ -36,16 +39,10 @@ function DetailedPostView() {
 					/>
 				)}
 
-			<div className="">
-				{comments.map((comment) => (
-					<div key={comment.id}>
-						<p>{comment.body}</p>
-						<p>{comment.score}</p>
-					</div>
-				))}
-			</div>
+			{comments && <CommentList comments={comments} />}
+
 			{/* </div> */}
-		</div>
+		</>
 	);
 }
 

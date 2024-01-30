@@ -11,8 +11,6 @@ import {
 
 import Image from "react-bootstrap/Image";
 import ListGroup from "react-bootstrap/ListGroup";
-import { useNavigate } from "react-router";
-import Subreddit from "./Subreddit";
 
 function SubredditsList() {
 	const dispatch = useDispatch();
@@ -38,10 +36,10 @@ function SubredditsList() {
 						key={index}
 					>
 						{subreddit.icon_img && (
-							<img
+							<Image
 								src={subreddit.icon_img}
 								alt="Subreddit header image"
-								className="rounded-circle"
+								roundedCircle
 								width={50}
 								height={50}
 							/>

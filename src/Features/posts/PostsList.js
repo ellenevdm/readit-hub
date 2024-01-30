@@ -6,6 +6,9 @@ import {
 	selectSelectedSubreddit,
 } from "../../store/redditSlice";
 
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 import PostItem from "./PostItem";
 
 function PostsList() {
@@ -19,9 +22,9 @@ function PostsList() {
 
 	return (
 		<div>
-			{posts.map((post, index) => (
+			{posts.map((post) => (
 				<PostItem
-					key={index}
+					key={post.id}
 					post={post}
 				/>
 			))}
