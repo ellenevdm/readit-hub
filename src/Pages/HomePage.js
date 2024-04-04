@@ -1,31 +1,27 @@
-import { useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
-import { Provider, useDispatch } from "react-redux";
-
-import reddit from "../Api/redditApi";
-import Header from "../Components/Header";
+import {Col, Container, Row} from "react-bootstrap";
 import PostsList from "../Features/posts/PostsList";
 import SubredditsList from "../Features/subreddits/SubredditsList";
 
 const HomePage = () => {
-	return (
-		<div>
-			<Container>
-				<Header />
+    return (
+        <>
 
-				<Container>
-					<Row>
-						<Col>
-							<PostsList />
-						</Col>
-						<Col>
-							<SubredditsList />
-						</Col>
-					</Row>
-				</Container>
-			</Container>
-		</div>
-	);
+            {/*<Header/>*/}
+
+            <Container>
+                <Row>
+                    <Col sm={3}>
+                        <SubredditsList/>
+                    </Col>
+                    <Col sm={8}>
+                        <PostsList/>
+                    </Col>
+
+                </Row>
+            </Container>
+
+        </>
+    );
 };
 
 export default HomePage;
