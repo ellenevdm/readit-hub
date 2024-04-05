@@ -1,34 +1,33 @@
-import React, {useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {fetchPostDetails, selectComments, selectDetailedPost,} from "../../store/redditSlice";
+import React, { useEffect } from "react";
+import {
+	fetchPostDetails,
+	selectComments,
+	selectDetailedPost,
+} from "../../Store/redditSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-import {useParams} from "react-router";
 import CommentList from "./DetailedPost/CommentList";
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import DetailedPost from "./DetailedPost/DetailedPost";
+import { useParams } from "react-router";
 
 function DetailedPostView() {
-    const dispatch = useDispatch();
-    const post = useSelector(selectDetailedPost);
-    const comments = useSelector(selectComments);
-    const {postId} = useParams();
+	const dispatch = useDispatch();
+	const post = useSelector(selectDetailedPost);
+	const comments = useSelector(selectComments);
+	const { postId } = useParams();
 
-    useEffect(() => {
-        dispatch(fetchPostDetails(postId));
-    }, [dispatch, postId]);
+	useEffect(() => {
+		dispatch(fetchPostDetails(postId));
+	}, [dispatch, postId]);
 
-    return (
-        <Container>
+	return (
+		<Container>
+			<DetailedPost post={post} />
 
-
-            <DetailedPost post={post}/>
-
-
-            {comments && <CommentList comments={comments}/>}
-
-
-        </Container>
-    );
+			{comments && <CommentList comments={comments} />}
+		</Container>
+	);
 }
 
 export default DetailedPostView;
